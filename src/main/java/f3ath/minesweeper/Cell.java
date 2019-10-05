@@ -29,7 +29,7 @@ final class Cell implements CellView {
     }
 
     boolean hasNoBombsAround() {
-        return !hasBomb() && content.getBombsAround() == 0;
+        return content.getBombsAround() == 0;
     }
 
     @Override

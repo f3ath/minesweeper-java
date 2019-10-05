@@ -15,9 +15,17 @@ final public class Board {
     public void click(Coordinate coordinate) {
         final var cell = cells.get(coordinate);
         cell.open();
+        if (cell.hasBomb()) {
+            gameOver();
+            return;
+        }
         if (cell.hasNoBombsAround()) {
             propagateClicks(coordinate);
         }
+    }
+
+    private void gameOver() {
+        // TODO: implement me
     }
 
     private short bombsAround(Coordinate coordinate, Grid<Boolean> bombs) {
