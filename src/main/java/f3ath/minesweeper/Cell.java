@@ -24,7 +24,7 @@ final class Cell implements CellView {
         return content.isBomb();
     }
 
-    public short numberOfBombsAround() {
+    public short bombsAround() {
         return content.getBombsAround();
     }
 
@@ -33,7 +33,7 @@ final class Cell implements CellView {
     }
 
     boolean hasNoBombsAround() {
-        return !hasBomb() && numberOfBombsAround() == 0;
+        return !hasBomb() && bombsAround() == 0;
     }
 
     private interface Content {

@@ -88,7 +88,7 @@ class FunctionalTest {
         if (cell.hasBomb()) {
             return '*';
         }
-        return String.valueOf(cell.numberOfBombsAround()).charAt(0);
+        return String.valueOf(cell.bombsAround()).charAt(0);
 
     }
 }

@@ -6,11 +6,10 @@ final public class Board {
     private final Grid<Cell> cells;
 
     public Board(int width, int height, Stream<Coordinate> bombs) {
-
         final var bombMap = new Grid<>(width, height, c -> false)
                 .modify(bombs, c -> true);
         cells = bombMap
-                .map((isBomb, c) -> isBomb ? Cell.bomb() : Cell.free(countBombsAround(c, bombMap)));
+                .map((isBomb, c) -> isBomb ? Cell.bomb() : Cell.free(bombsAround(c, bombMap)));
     }
 
     public void click(Coordinate coordinate) {
@@ -21,7 +20,7 @@ final public class Board {
         }
     }
 
-    private short countBombsAround(Coordinate coordinate, Grid<Boolean> bombs) {
+    private short bombsAround(Coordinate coordinate, Grid<Boolean> bombs) {
         return (short) coordinate
                 .neighbors()
                 .filter(bombs::contains)

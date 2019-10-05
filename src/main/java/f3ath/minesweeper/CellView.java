@@ -5,5 +5,5 @@ public interface CellView {
 
     boolean hasBomb();
 
-    short numberOfBombsAround();
+    short bombsAround();
 }
