@@ -10,7 +10,15 @@ final public class Board {
         final var bombMap = new Grid<>(width, height, c -> false)
                 .modify(bombs, c -> true);
         cells = bombMap
-                .map((isBomb, c) -> isBomb ? Cell.bomb() : Cell.empty(countBombsAround(c, bombMap)));
+                .map((isBomb, c) -> isBomb ? Cell.bomb() : Cell.free(countBombsAround(c, bombMap)));
+    }
+
+    public void click(Coordinate coordinate) {
+        final var cell = cells.get(coordinate);
+        cell.open();
+        if (cell.hasNoBombsAround()) {
+            propagateClicks(coordinate);
+        }
     }
 
     private short countBombsAround(Coordinate coordinate, Grid<Boolean> bombs) {
@@ -19,16 +27,6 @@ final public class Board {
                 .filter(bombs::contains)
                 .filter(bombs::get)
                 .count();
-    }
-
-
-    public void click(Coordinate coordinate) {
-        final var cell = cells.get(coordinate);
-        cell.open();
-        if (!cell.hasBomb() && cell.numberOfBombsAround() == 0) {
-            propagateClicks(coordinate);
-        }
-
     }
 
     private void propagateClicks(Coordinate coordinate) {

@@ -12,8 +12,8 @@ final class Cell implements CellView {
         return new Cell(new Bomb());
     }
 
-    static Cell empty(short bombsAround) {
-        return new Cell(new Count(bombsAround));
+    static Cell free(short bombsAround) {
+        return new Cell(new Free(bombsAround));
     }
 
     public boolean isOpen() {
@@ -30,6 +30,10 @@ final class Cell implements CellView {
 
     void open() {
         isOpen = true;
+    }
+
+    boolean hasNoBombsAround() {
+        return !hasBomb() && numberOfBombsAround() == 0;
     }
 
     private interface Content {
@@ -50,10 +54,10 @@ final class Cell implements CellView {
         }
     }
 
-    private static class Count implements Content {
+    private static class Free implements Content {
         private final short bombsAround;
 
-        Count(short bombsAround) {
+        Free(short bombsAround) {
             this.bombsAround = bombsAround;
         }
 
