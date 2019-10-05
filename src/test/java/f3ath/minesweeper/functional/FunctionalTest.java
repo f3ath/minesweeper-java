@@ -1,7 +1,7 @@
 package f3ath.minesweeper.functional;
 
 import f3ath.minesweeper.Board;
-import f3ath.minesweeper.CellView;
+import f3ath.minesweeper.CellRenderer;
 import f3ath.minesweeper.Coordinate;
 import f3ath.minesweeper.Grid;
 import org.junit.jupiter.api.Test;
@@ -11,10 +11,12 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class FunctionalTest {
+    private static final CharRenderer renderer = new CharRenderer();
 
     @Test
     void game3x3UserLoses() {
         final var board = new Board(3, 3, Stream.of(new Coordinate(2, 2)));
+
         assertBoard(new Character[][]{
                 {' ', ' ', ' '},
                 {' ', ' ', ' '},
@@ -75,20 +77,26 @@ class FunctionalTest {
     private void assertBoard(Character[][] expected, Board board) {
         final var actual = new Character[board.getHeight()][board.getWidth()];
         new Grid<>(board.getWidth(), board.getHeight(), board::getCell)
-                .map(this::cellToChar)
-                .forEachCell((c, cell) -> actual[c.getY()][c.getX()] = cell);
+                .forEachCell((c, cell) -> actual[c.getY()][c.getX()] = cell.render(renderer));
 
         assertArrayEquals(expected, actual);
     }
 
-    private char cellToChar(CellView cell) {
-        if (!cell.isOpen()) {
-            return ' ';
-        }
-        if (cell.hasBomb()) {
+    private static class CharRenderer implements CellRenderer<Character> {
+
+        @Override
+        public Character bomb() {
             return '*';
         }
-        return String.valueOf(cell.bombsAround()).charAt(0);
 
+        @Override
+        public Character free(short bombsAround) {
+            return String.valueOf(bombsAround).charAt(0);
+        }
+
+        @Override
+        public Character unopened() {
+            return ' ';
+        }
     }
 }

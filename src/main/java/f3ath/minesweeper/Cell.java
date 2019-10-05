@@ -16,16 +16,12 @@ final class Cell implements CellView {
         return new Cell(new Free(bombsAround));
     }
 
-    public boolean isOpen() {
+    boolean isOpen() {
         return isOpen;
     }
 
-    public boolean hasBomb() {
+    boolean hasBomb() {
         return content.isBomb();
-    }
-
-    public short bombsAround() {
-        return content.getBombsAround();
     }
 
     void open() {
@@ -33,7 +29,18 @@ final class Cell implements CellView {
     }
 
     boolean hasNoBombsAround() {
-        return !hasBomb() && bombsAround() == 0;
+        return !hasBomb() && content.getBombsAround() == 0;
+    }
+
+    @Override
+    public <T> T render(CellRenderer<T> renderer) {
+        if (!isOpen()) {
+            return renderer.unopened();
+        }
+        if (hasBomb()) {
+            return renderer.bomb();
+        }
+        return renderer.free(content.getBombsAround());
     }
 
     private interface Content {
