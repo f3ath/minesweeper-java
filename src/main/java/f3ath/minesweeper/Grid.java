@@ -20,12 +20,12 @@ public class Grid<T> {
     }
 
     public <U> Grid<U> map(Mapper<T, Coordinate, U> mapper) {
-        return new Grid<>(width, height, c -> mapper.apply(grid[c.getY()][c.getX()], c));
+        return new Grid<>(width, height, c -> mapper.apply(get(c), c));
     }
 
     public Grid<T> modify(Stream<Coordinate> coordinates, Mapper<T, Coordinate, T> mutator) {
         final var newGrid = map(Function.identity());
-        coordinates.forEach(c -> newGrid.grid[c.getY()][c.getX()] = mutator.apply(newGrid.grid[c.getY()][c.getX()], c));
+        coordinates.forEach(c -> newGrid.grid[c.getY()][c.getX()] = mutator.apply(newGrid.get(c), c));
         return newGrid;
     }
 
@@ -34,7 +34,7 @@ public class Grid<T> {
     }
 
     public void forEachCell(Walker<Coordinate, T> walker) {
-        coordinateStream().forEach(c -> walker.apply(c, grid[c.getY()][c.getX()]));
+        coordinateStream().forEach(c -> walker.apply(c, get(c)));
     }
 
 
