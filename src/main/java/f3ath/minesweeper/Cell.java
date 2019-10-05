@@ -34,13 +34,13 @@ final class Cell implements CellView {
 
     @Override
     public <T> T render(CellRenderer<T> renderer) {
-        if (!isOpen()) {
-            return renderer.unopened();
+        if (isOpen()) {
+            if (hasBomb()) {
+                return renderer.bomb();
+            }
+            return renderer.free(content.getBombsAround());
         }
-        if (hasBomb()) {
-            return renderer.bomb();
-        }
-        return renderer.free(content.getBombsAround());
+        return renderer.unopened();
     }
 
     private interface Content {
