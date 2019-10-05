@@ -2,7 +2,7 @@ package f3ath.minesweeper;
 
 import java.util.stream.Stream;
 
-public class Board {
+final public class Board {
     private final Grid<Cell> cells;
 
     public Board(int width, int height, Stream<Coordinate> bombs) {

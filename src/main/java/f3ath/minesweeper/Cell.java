@@ -1,6 +1,6 @@
 package f3ath.minesweeper;
 
-class Cell implements CellView {
+final class Cell implements CellView {
     private boolean isOpen = false;
     private final Content content;
 

@@ -4,7 +4,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class Coordinate {
+final public class Coordinate {
     private final int x;
     private final int y;
 
@@ -21,33 +21,28 @@ public class Coordinate {
         return y;
     }
 
-
-    public Coordinate move(int dX, int dY) {
-        return new Coordinate(x + dX, y + dY);
+    @Override
+    public String toString() {
+        return String.format("%d:%d", getX(), getY());
     }
 
-    public boolean isEqual(Coordinate c) {
-        return x == c.x && y == c.y;
-    }
-
-    public Stream<Coordinate> neighbors() {
+    Stream<Coordinate> neighbors() {
         return neighbors(1);
     }
 
-    public Stream<Coordinate> neighbors(int distance) {
+    Stream<Coordinate> neighbors(int distance) {
         return range(distance)
                 .map(dX -> range(distance).map(dY -> move(dX, dY)))
                 .flatMap(Function.identity())
                 .filter(Predicate.not(this::isEqual));
     }
 
-    int toLinear(int width) {
-        return width * y + x;
+    private Coordinate move(int dX, int dY) {
+        return new Coordinate(x + dX, y + dY);
     }
 
-    @Override
-    public String toString() {
-        return String.format("%d:%d", getX(), getY());
+    private boolean isEqual(Coordinate c) {
+        return x == c.x && y == c.y;
     }
 
     private Stream<Integer> range(int distance) {

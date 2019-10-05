@@ -37,22 +37,6 @@ public class Grid<T> {
         coordinateStream().forEach(c -> walker.apply(c, get(c)));
     }
 
-
-    public Stream<Coordinate> coordinateStream() {
-        return range(width)
-                .map(x ->
-                        range(height)
-                                .map(y -> new Coordinate(x, y))
-                )
-                .flatMap(Function.identity());
-    }
-
-    private Stream<Integer> range(int limit) {
-        return Stream
-                .iterate(0, i -> i + 1)
-                .limit(limit);
-    }
-
     public T get(Coordinate c) {
         return grid[c.getY()][c.getX()];
     }
@@ -67,6 +51,21 @@ public class Grid<T> {
 
     public boolean contains(Coordinate c) {
         return c.getX() >= 0 && c.getX() < getWidth() && c.getY() >= 0 && c.getY() < getHeight();
+    }
+
+    private Stream<Coordinate> coordinateStream() {
+        return range(width)
+                .map(x ->
+                        range(height)
+                                .map(y -> new Coordinate(x, y))
+                )
+                .flatMap(Function.identity());
+    }
+
+    private Stream<Integer> range(int limit) {
+        return Stream
+                .iterate(0, i -> i + 1)
+                .limit(limit);
     }
 
     @FunctionalInterface

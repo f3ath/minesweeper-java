@@ -73,7 +73,7 @@ class FunctionalTest {
     }
 
     private void assertBoard(Character[][] expected, Board board) {
-        final var actual = new Character[board.getWidth()][board.getHeight()];
+        final var actual = new Character[board.getHeight()][board.getWidth()];
         new Grid<>(board.getWidth(), board.getHeight(), board::getCell)
                 .map(this::cellToChar)
                 .forEachCell((c, cell) -> actual[c.getY()][c.getX()] = cell);
