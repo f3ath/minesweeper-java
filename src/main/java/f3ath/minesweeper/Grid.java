@@ -1,19 +1,18 @@
 package f3ath.minesweeper;
 
-import java.util.ArrayList;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class Grid<T> implements Box {
+public class Grid<T> {
     private final int width;
     private final int height;
-    private final ArrayList<ArrayList<T>> grid;
+    private final T[][] grid;
 
     public Grid(int width, int height, Function<Coordinate, T> init) {
         this.width = width;
         this.height = height;
-        grid = new ArrayList<>();
-        coordinateStream().forEach(c -> c.setIn(grid, init.apply(c)));
+        grid = (T[][]) new Object[height][width];
+        coordinateStream().forEach(c -> grid[c.getY()][c.getX()] = init.apply(c));
     }
 
     public <U> Grid<U> map(Function<T, U> mapper) {
@@ -21,12 +20,12 @@ public class Grid<T> implements Box {
     }
 
     public <U> Grid<U> map(Mapper<T, Coordinate, U> mapper) {
-        return new Grid<>(width, height, c -> mapper.apply(c.getFrom(grid), c));
+        return new Grid<>(width, height, c -> mapper.apply(grid[c.getY()][c.getX()], c));
     }
 
     public Grid<T> modify(Stream<Coordinate> coordinates, Mapper<T, Coordinate, T> mutator) {
         final var newGrid = map(Function.identity());
-        coordinates.forEach(c -> c.setIn(newGrid.grid, mutator.apply(c.getFrom(newGrid.grid), c)));
+        coordinates.forEach(c -> newGrid.grid[c.getY()][c.getX()] = mutator.apply(newGrid.grid[c.getY()][c.getX()], c));
         return newGrid;
     }
 
@@ -35,7 +34,7 @@ public class Grid<T> implements Box {
     }
 
     public void forEachCell(Walker<Coordinate, T> walker) {
-        coordinateStream().forEach(c -> walker.apply(c, c.getFrom(grid)));
+        coordinateStream().forEach(c -> walker.apply(c, grid[c.getY()][c.getX()]));
     }
 
 
@@ -55,17 +54,19 @@ public class Grid<T> implements Box {
     }
 
     public T get(Coordinate c) {
-        return c.getFrom(grid);
+        return grid[c.getY()][c.getX()];
     }
 
-    @Override
     public int getWidth() {
         return width;
     }
 
-    @Override
     public int getHeight() {
         return height;
+    }
+
+    public boolean contains(Coordinate c) {
+        return c.getX() >= 0 && c.getX() < getWidth() && c.getY() >= 0 && c.getY() < getHeight();
     }
 
     @FunctionalInterface

@@ -15,7 +15,8 @@ public class Board {
 
     private short countBombsAround(Coordinate coordinate, Grid<Boolean> bombs) {
         return (short) coordinate
-                .neighbors(bombs)
+                .neighbors()
+                .filter(bombs::contains)
                 .filter(bombs::get)
                 .count();
     }
@@ -32,7 +33,8 @@ public class Board {
 
     private void propagateClicks(Coordinate coordinate) {
         coordinate
-                .neighbors(cells)
+                .neighbors()
+                .filter(cells::contains)
                 .filter(n -> !cells.get(n).isOpen())
                 .forEach(this::click);
     }
@@ -47,9 +49,5 @@ public class Board {
 
     public CellView getCell(Coordinate c) {
         return cells.get(c);
-    }
-
-    public Grid<? extends CellView> getView() {
-        return cells;
     }
 }

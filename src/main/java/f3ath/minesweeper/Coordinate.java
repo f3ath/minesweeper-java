@@ -1,6 +1,7 @@
 package f3ath.minesweeper;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class Coordinate {
@@ -12,17 +13,14 @@ public class Coordinate {
         this.y = y;
     }
 
-    public <T> T getFrom(T[][] array) {
-        return array[x][y];
+    public int getX() {
+        return x;
     }
 
-    public <T> void setIn(T[][] array, T value) {
-        array[x][y] = value;
+    public int getY() {
+        return y;
     }
 
-    public boolean inBounds(Box box) {
-        return x >= 0 && x < box.getWidth() && y >= 0 && y < box.getHeight();
-    }
 
     public Coordinate move(int dX, int dY) {
         return new Coordinate(x + dX, y + dY);
@@ -32,19 +30,28 @@ public class Coordinate {
         return x == c.x && y == c.y;
     }
 
-    public boolean isNotEqual(Coordinate c) {
-        return !isEqual(c);
+    public Stream<Coordinate> neighbors() {
+        return neighbors(1);
     }
 
-    public Stream<Coordinate> neighbors(Box box) {
-        return deltas()
-                .map(dX -> deltas().map(dY -> move(dX, dY)))
+    public Stream<Coordinate> neighbors(int distance) {
+        return range(distance)
+                .map(dX -> range(distance).map(dY -> move(dX, dY)))
                 .flatMap(Function.identity())
-                .filter(this::isNotEqual)
-                .filter(c -> c.inBounds(box));
+                .filter(Predicate.not(this::isEqual));
     }
 
-    private Stream<Integer> deltas() {
-        return Stream.of(-1, 0, 1);
+    int toLinear(int width) {
+        return width * y + x;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%d:%d", getX(), getY());
+    }
+
+    private Stream<Integer> range(int distance) {
+        final var d = Math.max(0, distance);
+        return Stream.iterate(-d, i -> i + 1).limit(2 * d + 1);
     }
 }
