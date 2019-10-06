@@ -1,9 +1,9 @@
 package f3ath.minesweeper;
 
 public interface CellViewRenderer<T> {
-    T bomb();
+    T mine();
 
-    T free(short bombsAround);
+    T free(short minesAround);
 
     T unopened();
 }

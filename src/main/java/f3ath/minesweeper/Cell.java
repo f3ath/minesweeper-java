@@ -8,28 +8,28 @@ final class Cell implements CellView {
         this.content = content;
     }
 
-    static Cell bomb() {
-        return new Cell(new Bomb());
+    static Cell mine() {
+        return new Cell(new Mine());
     }
 
-    static Cell free(short bombsAround) {
-        return new Cell(new Free(bombsAround));
+    static Cell free(short minesAround) {
+        return new Cell(new Free(minesAround));
     }
 
     boolean isOpen() {
         return state.isOpen();
     }
 
-    boolean hasBomb() {
-        return content.isBomb();
+    boolean isMine() {
+        return content.isMine();
     }
 
     void open() {
         state = new Open(content);
     }
 
-    boolean hasNoBombsAround() {
-        return content.getBombsAround() == 0;
+    boolean hasNoMinesAround() {
+        return content.getMinesAround() == 0;
     }
 
     @Override
@@ -39,54 +39,54 @@ final class Cell implements CellView {
 
     private interface Content {
 
-        boolean isBomb();
+        boolean isMine();
 
-        short getBombsAround();
+        short getMinesAround();
 
         <T> T render(CellViewRenderer<T> renderer);
 
     }
 
-    private static class Bomb implements Content {
+    private static class Mine implements Content {
 
         @Override
-        public boolean isBomb() {
+        public boolean isMine() {
             return true;
         }
 
         @Override
-        public short getBombsAround() {
+        public short getMinesAround() {
             throw new IllegalStateException();
         }
 
         @Override
         public <T> T render(CellViewRenderer<T> renderer) {
-            return renderer.bomb();
+            return renderer.mine();
         }
 
     }
 
     private static class Free implements Content {
 
-        private final short bombsAround;
+        private final short minesAround;
 
-        Free(short bombsAround) {
-            this.bombsAround = bombsAround;
+        Free(short minesAround) {
+            this.minesAround = minesAround;
         }
 
         @Override
-        public boolean isBomb() {
+        public boolean isMine() {
             return false;
         }
 
         @Override
-        public short getBombsAround() {
-            return bombsAround;
+        public short getMinesAround() {
+            return minesAround;
         }
 
         @Override
         public <T> T render(CellViewRenderer<T> renderer) {
-            return renderer.free(bombsAround);
+            return renderer.free(minesAround);
         }
 
     }

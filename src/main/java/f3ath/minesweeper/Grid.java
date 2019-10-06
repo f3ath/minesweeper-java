@@ -23,8 +23,8 @@ public class Grid<T> {
         return new Grid<>(width, height, c -> mapper.apply(get(c), c));
     }
 
-    Grid<T> modify(Stream<Coordinate> coordinates, Function<T, T> mutator) {
-        return modify(coordinates, (t, c) -> mutator.apply(t));
+    Grid<T> mutated(Stream<Coordinate> coordinates, Function<T, T> mutator) {
+        return mutated(coordinates, (t, c) -> mutator.apply(t));
     }
 
 
@@ -48,10 +48,10 @@ public class Grid<T> {
         return coordinates().map(this::get);
     }
 
-    private Grid<T> modify(Stream<Coordinate> coordinates, Mapper<T, Coordinate, T> mutator) {
-        final var newGrid = map(Function.identity());
-        coordinates.forEach(c -> newGrid.grid[c.getY()][c.getX()] = mutator.apply(newGrid.get(c), c));
-        return newGrid;
+    private Grid<T> mutated(Stream<Coordinate> coordinates, Mapper<T, Coordinate, T> mutator) {
+        final var copy = map(Function.identity());
+        coordinates.forEach(c -> copy.grid[c.getY()][c.getX()] = mutator.apply(copy.get(c), c));
+        return copy;
     }
 
     private <U> Grid<U> map(Function<T, U> mapper) {

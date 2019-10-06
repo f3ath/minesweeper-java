@@ -46,36 +46,42 @@ class FunctionalTest {
 
     @Test
     void game3x3UserWins() {
-        final var board = new Game(3, 3, Stream.of(new Coordinate(1, 2), new Coordinate(2, 2)));
+        final var game = new Game(3, 3, Stream.of(new Coordinate(1, 2), new Coordinate(2, 2)));
+
+        assertTrue(game.isInProgress());
         assertBoard(new Character[][]{
                 {' ', ' ', ' '},
                 {' ', ' ', ' '},
                 {' ', ' ', ' '},
-        }, board);
+        }, game);
 
-        board.click(new Coordinate(1, 1));
+        game.click(new Coordinate(1, 1));
 
+        assertTrue(game.isInProgress());
         assertBoard(new Character[][]{
                 {' ', ' ', ' '},
                 {' ', '2', ' '},
                 {' ', ' ', ' '},
-        }, board);
+        }, game);
 
-        board.click(new Coordinate(0, 0));
+        game.click(new Coordinate(0, 0));
 
+        assertTrue(game.isInProgress());
         assertBoard(new Character[][]{
                 {'0', '0', '0'},
                 {'1', '2', '2'},
                 {' ', ' ', ' '},
-        }, board);
+        }, game);
 
-        board.click(new Coordinate(0, 2));
+        game.click(new Coordinate(0, 2));
 
+        assertFalse(game.isInProgress());
+        assertTrue(game.isWon());
         assertBoard(new Character[][]{
                 {'0', '0', '0'},
                 {'1', '2', '2'},
                 {'1', ' ', ' '},
-        }, board);
+        }, game);
     }
 
     private void assertBoard(Character[][] expected, Game game) {
@@ -89,13 +95,13 @@ class FunctionalTest {
     private static class CharRenderer implements CellViewRenderer<Character> {
 
         @Override
-        public Character bomb() {
+        public Character mine() {
             return '*';
         }
 
         @Override
-        public Character free(short bombsAround) {
-            return String.valueOf(bombsAround).charAt(0);
+        public Character free(short minesAround) {
+            return String.valueOf(minesAround).charAt(0);
         }
 
         @Override

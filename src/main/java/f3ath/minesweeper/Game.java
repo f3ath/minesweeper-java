@@ -1,31 +1,19 @@
 package f3ath.minesweeper;
 
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 final public class Game {
     private final Grid<Cell> board;
     private State state;
 
-    public Game(int width, int height, Stream<Coordinate> bombs) {
-        final var bombMap = new Grid<>(width, height, c -> false)
-                .modify(bombs, c -> true);
-        board = bombMap
-                .map((isBomb, c) -> isBomb ? Cell.bomb() : Cell.free(bombsAround(c, bombMap)));
-
+    public Game(int width, int height, Stream<Coordinate> mines) {
+        board = new MineField(width, height, mines).generateBoard();
         state = new InProgress();
     }
 
     public void click(Coordinate coordinate) {
         state = state.click(coordinate, board);
-    }
-
-
-    private short bombsAround(Coordinate coordinate, Grid<Boolean> bombs) {
-        return (short) coordinate
-                .neighbors()
-                .filter(bombs::contains)
-                .filter(bombs::get)
-                .count();
     }
 
     public int getBoardWidth() {
@@ -48,12 +36,83 @@ final public class Game {
         return state.isLost();
     }
 
+    public boolean isWon() {
+        return state.isWon();
+    }
+
+    private static class MineField {
+        private final Grid<Boolean> mines;
+
+        MineField(int width, int height, Stream<Coordinate> mines) {
+            this.mines = new Grid<>(width, height, c -> false).mutated(mines, c -> true);
+        }
+
+        Grid<Cell> generateBoard() {
+            return mines.map((isMine, c) -> isMine ? Cell.mine() : Cell.free(minesAround(c)));
+        }
+
+        private short minesAround(Coordinate coordinate) {
+            return (short) coordinate
+                    .neighbors()
+                    .filter(mines::contains)
+                    .filter(mines::get)
+                    .count();
+        }
+
+    }
+
     private interface State {
         State click(Coordinate coordinate, Grid<Cell> board);
 
         boolean isInProgress();
 
         boolean isLost();
+
+        boolean isWon();
+    }
+
+    private static class GameWon implements State {
+        @Override
+        public State click(Coordinate coordinate, Grid<Cell> board) {
+            return this;
+        }
+
+        @Override
+        public boolean isInProgress() {
+            return false;
+        }
+
+        @Override
+        public boolean isLost() {
+            return false;
+        }
+
+        @Override
+        public boolean isWon() {
+            return true;
+        }
+    }
+
+    private static class GameLost implements State {
+        @Override
+        public State click(Coordinate coordinate, Grid<Cell> board) {
+            return this;
+        }
+
+        @Override
+        public boolean isInProgress() {
+            return false;
+        }
+
+        @Override
+        public boolean isLost() {
+            return true;
+        }
+
+        @Override
+        public boolean isWon() {
+            return false;
+        }
     }
 
     private static class InProgress implements State {
@@ -62,21 +121,17 @@ final public class Game {
         public State click(Coordinate coordinate, Grid<Cell> board) {
             final var cell = board.get(coordinate);
             cell.open();
-            if (cell.hasBomb()) {
-                revealBombs(board);
+            if (cell.isMine()) {
+                revealAllMines(board);
                 return new GameLost();
             }
-            if (cell.hasNoBombsAround()) {
+            if (cell.hasNoMinesAround()) {
                 propagateClicks(coordinate, board);
             }
+            if (board.cells().filter(Predicate.not(Cell::isMine)).allMatch(Cell::isOpen)) {
+                return new GameWon();
+            }
             return this;
-        }
-
-        private void revealBombs(Grid<Cell> board) {
-            board
-                    .cells()
-                    .filter(Cell::hasBomb)
-                    .forEach(Cell::open);
         }
 
         @Override
@@ -89,6 +144,18 @@ final public class Game {
             return false;
         }
 
+        @Override
+        public boolean isWon() {
+            return false;
+        }
+
+        private void revealAllMines(Grid<Cell> board) {
+            board
+                    .cells()
+                    .filter(Cell::isMine)
+                    .forEach(Cell::open);
+        }
+
         private void propagateClicks(Coordinate coordinate, Grid<Cell> board) {
             coordinate
                     .neighbors()
@@ -97,21 +164,6 @@ final public class Game {
                     .forEach(c -> click(c, board));
         }
 
-        private static class GameLost implements State {
-            @Override
-            public State click(Coordinate coordinate, Grid<Cell> board) {
-                return this;
-            }
 
-            @Override
-            public boolean isInProgress() {
-                return false;
-            }
-
-            @Override
-            public boolean isLost() {
-                return true;
-            }
-        }
     }
 }
