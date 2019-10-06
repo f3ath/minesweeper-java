@@ -1,48 +1,52 @@
 package f3ath.minesweeper.functional;
 
-import f3ath.minesweeper.Board;
-import f3ath.minesweeper.CellRenderer;
+import f3ath.minesweeper.Game;
+import f3ath.minesweeper.CellViewRenderer;
 import f3ath.minesweeper.Coordinate;
 import f3ath.minesweeper.Grid;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionalTest {
     private static final CharRenderer renderer = new CharRenderer();
 
     @Test
     void game3x3UserLoses() {
-        final var board = new Board(3, 3, Stream.of(new Coordinate(2, 2)));
+        final var game = new Game(3, 3, Stream.of(new Coordinate(2, 2), new Coordinate(2, 0)));
 
+        assertTrue(game.isInProgress());
         assertBoard(new Character[][]{
                 {' ', ' ', ' '},
                 {' ', ' ', ' '},
                 {' ', ' ', ' '},
-        }, board);
+        }, game);
 
-        board.click(new Coordinate(1, 1));
+        game.click(new Coordinate(1, 1));
 
+        assertTrue(game.isInProgress());
         assertBoard(new Character[][]{
                 {' ', ' ', ' '},
-                {' ', '1', ' '},
+                {' ', '2', ' '},
                 {' ', ' ', ' '},
-        }, board);
+        }, game);
 
-        board.click(new Coordinate(2, 2));
+        game.click(new Coordinate(2, 2));
 
+        assertFalse(game.isInProgress());
+        assertTrue(game.isLost());
         assertBoard(new Character[][]{
-                {' ', ' ', ' '},
-                {' ', '1', ' '},
                 {' ', ' ', '*'},
-        }, board);
+                {' ', '2', ' '},
+                {' ', ' ', '*'},
+        }, game);
     }
 
     @Test
     void game3x3UserWins() {
-        final var board = new Board(3, 3, Stream.of(new Coordinate(1, 2), new Coordinate(2, 2)));
+        final var board = new Game(3, 3, Stream.of(new Coordinate(1, 2), new Coordinate(2, 2)));
         assertBoard(new Character[][]{
                 {' ', ' ', ' '},
                 {' ', ' ', ' '},
@@ -74,15 +78,15 @@ class FunctionalTest {
         }, board);
     }
 
-    private void assertBoard(Character[][] expected, Board board) {
-        final var actual = new Character[board.getHeight()][board.getWidth()];
-        new Grid<>(board.getWidth(), board.getHeight(), board::getCell)
+    private void assertBoard(Character[][] expected, Game game) {
+        final var actual = new Character[game.getBoardHeight()][game.getBoardWidth()];
+        new Grid<>(game.getBoardWidth(), game.getBoardHeight(), game::getCell)
                 .forEachCell((c, cell) -> actual[c.getY()][c.getX()] = cell.render(renderer));
 
         assertArrayEquals(expected, actual);
     }
 
-    private static class CharRenderer implements CellRenderer<Character> {
+    private static class CharRenderer implements CellViewRenderer<Character> {
 
         @Override
         public Character bomb() {

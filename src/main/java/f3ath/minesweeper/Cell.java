@@ -1,7 +1,7 @@
 package f3ath.minesweeper;
 
 final class Cell implements CellView {
-    private boolean isOpen = false;
+    private State state = new Hidden();
     private final Content content;
 
     private Cell(Content content) {
@@ -17,7 +17,7 @@ final class Cell implements CellView {
     }
 
     boolean isOpen() {
-        return isOpen;
+        return state.isOpen();
     }
 
     boolean hasBomb() {
@@ -25,7 +25,7 @@ final class Cell implements CellView {
     }
 
     void open() {
-        isOpen = true;
+        state = new Open(content);
     }
 
     boolean hasNoBombsAround() {
@@ -33,23 +33,22 @@ final class Cell implements CellView {
     }
 
     @Override
-    public <T> T render(CellRenderer<T> renderer) {
-        if (isOpen()) {
-            if (hasBomb()) {
-                return renderer.bomb();
-            }
-            return renderer.free(content.getBombsAround());
-        }
-        return renderer.unopened();
+    public <T> T render(CellViewRenderer<T> renderer) {
+        return state.render(renderer);
     }
 
     private interface Content {
+
         boolean isBomb();
 
         short getBombsAround();
+
+        <T> T render(CellViewRenderer<T> renderer);
+
     }
 
     private static class Bomb implements Content {
+
         @Override
         public boolean isBomb() {
             return true;
@@ -59,9 +58,16 @@ final class Cell implements CellView {
         public short getBombsAround() {
             throw new IllegalStateException();
         }
+
+        @Override
+        public <T> T render(CellViewRenderer<T> renderer) {
+            return renderer.bomb();
+        }
+
     }
 
     private static class Free implements Content {
+
         private final short bombsAround;
 
         Free(short bombsAround) {
@@ -76,6 +82,48 @@ final class Cell implements CellView {
         @Override
         public short getBombsAround() {
             return bombsAround;
+        }
+
+        @Override
+        public <T> T render(CellViewRenderer<T> renderer) {
+            return renderer.free(bombsAround);
+        }
+
+    }
+
+    private interface State {
+        boolean isOpen();
+
+        <T> T render(CellViewRenderer<T> renderer);
+    }
+
+    private static class Hidden implements State {
+        @Override
+        public boolean isOpen() {
+            return false;
+        }
+
+        @Override
+        public <T> T render(CellViewRenderer<T> renderer) {
+            return renderer.unopened();
+        }
+    }
+
+    private static class Open implements State {
+        private final Content content;
+
+        Open(Content content) {
+            this.content = content;
+        }
+
+        @Override
+        public boolean isOpen() {
+            return true;
+        }
+
+        @Override
+        public <T> T render(CellViewRenderer<T> renderer) {
+            return content.render(renderer);
         }
     }
 }

@@ -12,7 +12,7 @@ public class Grid<T> {
         this.width = width;
         this.height = height;
         grid = (T[][]) new Object[height][width];
-        coordinateStream().forEach(c -> grid[c.getY()][c.getX()] = init.apply(c));
+        coordinates().forEach(c -> grid[c.getY()][c.getX()] = init.apply(c));
     }
 
     public <U> Grid<U> map(Function<T, U> mapper) {
@@ -34,8 +34,9 @@ public class Grid<T> {
     }
 
     public void forEachCell(Walker<Coordinate, T> walker) {
-        coordinateStream().forEach(c -> walker.apply(c, get(c)));
+        coordinates().forEach(c -> walker.apply(c, get(c)));
     }
+
 
     public T get(Coordinate c) {
         return grid[c.getY()][c.getX()];
@@ -53,7 +54,11 @@ public class Grid<T> {
         return c.getX() >= 0 && c.getX() < getWidth() && c.getY() >= 0 && c.getY() < getHeight();
     }
 
-    private Stream<Coordinate> coordinateStream() {
+    public Stream<T> cells() {
+        return coordinates().map(this::get);
+    }
+
+    private Stream<Coordinate> coordinates() {
         return range(width)
                 .map(x ->
                         range(height)

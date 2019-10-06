@@ -1,6 +1,6 @@
 package f3ath.minesweeper;
 
-public interface CellRenderer<T> {
+public interface CellViewRenderer<T> {
     T bomb();
 
     T free(short bombsAround);
