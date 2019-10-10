@@ -8,7 +8,7 @@ public class Grid<T> {
     private final int height;
     private final T[][] grid;
 
-    public Grid(int width, int height, Function<Coordinate, T> init) {
+    Grid(int width, int height, Function<Coordinate, T> init) {
         this.width = width;
         this.height = height;
         grid = (T[][]) new Object[height][width];
@@ -48,6 +48,15 @@ public class Grid<T> {
         return coordinates().map(this::get);
     }
 
+    private Stream<Coordinate> coordinates() {
+        return range(width)
+                .map(x ->
+                        range(height)
+                                .map(y -> new Coordinate(x, y))
+                )
+                .flatMap(Function.identity());
+    }
+
     private Grid<T> mutated(Stream<Coordinate> coordinates, Mapper<T, Coordinate, T> mutator) {
         final var copy = map(Function.identity());
         coordinates.forEach(c -> copy.grid[c.getY()][c.getX()] = mutator.apply(copy.get(c), c));
@@ -56,15 +65,6 @@ public class Grid<T> {
 
     private <U> Grid<U> map(Function<T, U> mapper) {
         return map((t, c) -> mapper.apply(t));
-    }
-
-    private Stream<Coordinate> coordinates() {
-        return range(width)
-                .map(x ->
-                        range(height)
-                                .map(y -> new Coordinate(x, y))
-                )
-                .flatMap(Function.identity());
     }
 
     private Stream<Integer> range(int limit) {

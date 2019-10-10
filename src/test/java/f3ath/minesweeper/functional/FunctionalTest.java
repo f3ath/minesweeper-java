@@ -1,9 +1,8 @@
 package f3ath.minesweeper.functional;
 
-import f3ath.minesweeper.Game;
 import f3ath.minesweeper.CellViewRenderer;
 import f3ath.minesweeper.Coordinate;
-import f3ath.minesweeper.Grid;
+import f3ath.minesweeper.Game;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.Stream;
@@ -18,6 +17,8 @@ class FunctionalTest {
         final var game = new Game(3, 3, Stream.of(new Coordinate(2, 2), new Coordinate(2, 0)));
 
         assertTrue(game.isInProgress());
+        assertFalse(game.isWon());
+        assertFalse(game.isLost());
         assertBoard(new Character[][]{
                 {' ', ' ', ' '},
                 {' ', ' ', ' '},
@@ -27,6 +28,8 @@ class FunctionalTest {
         game.click(new Coordinate(1, 1));
 
         assertTrue(game.isInProgress());
+        assertFalse(game.isWon());
+        assertFalse(game.isLost());
         assertBoard(new Character[][]{
                 {' ', ' ', ' '},
                 {' ', '2', ' '},
@@ -36,6 +39,7 @@ class FunctionalTest {
         game.click(new Coordinate(2, 2));
 
         assertFalse(game.isInProgress());
+        assertFalse(game.isWon());
         assertTrue(game.isLost());
         assertBoard(new Character[][]{
                 {' ', ' ', '*'},
@@ -49,6 +53,8 @@ class FunctionalTest {
         final var game = new Game(3, 3, Stream.of(new Coordinate(1, 2), new Coordinate(2, 2)));
 
         assertTrue(game.isInProgress());
+        assertFalse(game.isWon());
+        assertFalse(game.isLost());
         assertBoard(new Character[][]{
                 {' ', ' ', ' '},
                 {' ', ' ', ' '},
@@ -58,6 +64,8 @@ class FunctionalTest {
         game.click(new Coordinate(1, 1));
 
         assertTrue(game.isInProgress());
+        assertFalse(game.isWon());
+        assertFalse(game.isLost());
         assertBoard(new Character[][]{
                 {' ', ' ', ' '},
                 {' ', '2', ' '},
@@ -67,6 +75,8 @@ class FunctionalTest {
         game.click(new Coordinate(0, 0));
 
         assertTrue(game.isInProgress());
+        assertFalse(game.isWon());
+        assertFalse(game.isLost());
         assertBoard(new Character[][]{
                 {'0', '0', '0'},
                 {'1', '2', '2'},
@@ -77,6 +87,7 @@ class FunctionalTest {
 
         assertFalse(game.isInProgress());
         assertTrue(game.isWon());
+        assertFalse(game.isLost());
         assertBoard(new Character[][]{
                 {'0', '0', '0'},
                 {'1', '2', '2'},
@@ -86,7 +97,7 @@ class FunctionalTest {
 
     private void assertBoard(Character[][] expected, Game game) {
         final var actual = new Character[game.getBoardHeight()][game.getBoardWidth()];
-        new Grid<>(game.getBoardWidth(), game.getBoardHeight(), game::getCell)
+        game.getBoard()
                 .forEachCell((c, cell) -> actual[c.getY()][c.getX()] = cell.render(renderer));
 
         assertArrayEquals(expected, actual);

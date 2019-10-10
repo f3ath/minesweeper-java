@@ -24,8 +24,8 @@ final public class Game {
         return board.getHeight();
     }
 
-    public CellView getCell(Coordinate c) {
-        return board.get(c);
+    public Grid<? extends CellView> getBoard() {
+        return board;
     }
 
     public boolean isInProgress() {
@@ -120,7 +120,7 @@ final public class Game {
         @Override
         public State click(Coordinate coordinate, Grid<Cell> board) {
             final var cell = board.get(coordinate);
-            cell.open();
+            cell.uncover();
             if (cell.isMine()) {
                 revealAllMines(board);
                 return new GameLost();
@@ -128,7 +128,7 @@ final public class Game {
             if (cell.hasNoMinesAround()) {
                 propagateClicks(coordinate, board);
             }
-            if (board.cells().filter(Predicate.not(Cell::isMine)).allMatch(Cell::isOpen)) {
+            if (board.cells().filter(Predicate.not(Cell::isMine)).noneMatch(Cell::isCovered)) {
                 return new GameWon();
             }
             return this;
@@ -153,14 +153,14 @@ final public class Game {
             board
                     .cells()
                     .filter(Cell::isMine)
-                    .forEach(Cell::open);
+                    .forEach(Cell::uncover);
         }
 
         private void propagateClicks(Coordinate coordinate, Grid<Cell> board) {
             coordinate
                     .neighbors()
                     .filter(board::contains)
-                    .filter(n -> !board.get(n).isOpen())
+                    .filter(n -> board.get(n).isCovered())
                     .forEach(c -> click(c, board));
         }
 

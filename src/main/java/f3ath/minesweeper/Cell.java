@@ -1,7 +1,7 @@
 package f3ath.minesweeper;
 
 final class Cell implements CellView {
-    private State state = new Hidden();
+    private State state = new Covered();
     private final Content content;
 
     private Cell(Content content) {
@@ -16,16 +16,16 @@ final class Cell implements CellView {
         return new Cell(new Free(minesAround));
     }
 
-    boolean isOpen() {
-        return state.isOpen();
+    boolean isCovered() {
+        return state.isCovered();
     }
 
     boolean isMine() {
         return content.isMine();
     }
 
-    void open() {
-        state = new Open(content);
+    void uncover() {
+        state = new Uncovered(content);
     }
 
     boolean hasNoMinesAround() {
@@ -92,15 +92,15 @@ final class Cell implements CellView {
     }
 
     private interface State {
-        boolean isOpen();
+        boolean isCovered();
 
         <T> T render(CellViewRenderer<T> renderer);
     }
 
-    private static class Hidden implements State {
+    private static class Covered implements State {
         @Override
-        public boolean isOpen() {
-            return false;
+        public boolean isCovered() {
+            return true;
         }
 
         @Override
@@ -109,16 +109,16 @@ final class Cell implements CellView {
         }
     }
 
-    private static class Open implements State {
+    private static class Uncovered implements State {
         private final Content content;
 
-        Open(Content content) {
+        Uncovered(Content content) {
             this.content = content;
         }
 
         @Override
-        public boolean isOpen() {
-            return true;
+        public boolean isCovered() {
+            return false;
         }
 
         @Override
