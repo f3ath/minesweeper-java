@@ -1,8 +1,8 @@
-package f3ath.minesweeper.functional;
+package f3ath.minesweeper.game.functional;
 
-import f3ath.minesweeper.CellViewRenderer;
-import f3ath.minesweeper.Coordinate;
-import f3ath.minesweeper.Game;
+import f3ath.minesweeper.game.CellViewRenderer;
+import f3ath.minesweeper.game.Coordinate;
+import f3ath.minesweeper.game.Game;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.Stream;
@@ -96,9 +96,11 @@ class FunctionalTest {
     }
 
     private void assertBoard(Character[][] expected, Game game) {
-        final var actual = new Character[game.getBoardHeight()][game.getBoardWidth()];
-        game.getBoard()
-                .forEachCell((c, cell) -> actual[c.getY()][c.getX()] = cell.render(renderer));
+        final var board = game.getBoard();
+
+        final var actual = new Character[board.getHeight()][board.getWidth()];
+
+        board.forEachCell((c, cell) -> actual[c.getY()][c.getX()] = cell.render(renderer));
 
         assertArrayEquals(expected, actual);
     }

@@ -1,4 +1,4 @@
-package f3ath.minesweeper;
+package f3ath.minesweeper.game;
 
 import java.util.function.Function;
 import java.util.function.Predicate;

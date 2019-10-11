@@ -1,4 +1,4 @@
-package f3ath.minesweeper;
+package f3ath.minesweeper.game;
 
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -19,6 +19,14 @@ public class Grid<T> {
         coordinates().forEach(c -> walker.apply(c, get(c)));
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     <U> Grid<U> map(Mapper<T, Coordinate, U> mapper) {
         return new Grid<>(width, height, c -> mapper.apply(get(c), c));
     }
@@ -32,13 +40,6 @@ public class Grid<T> {
         return grid[c.getY()][c.getX()];
     }
 
-    int getWidth() {
-        return width;
-    }
-
-    int getHeight() {
-        return height;
-    }
 
     boolean contains(Coordinate c) {
         return c.getX() >= 0 && c.getX() < getWidth() && c.getY() >= 0 && c.getY() < getHeight();

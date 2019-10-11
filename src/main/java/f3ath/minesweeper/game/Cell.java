@@ -1,4 +1,4 @@
-package f3ath.minesweeper;
+package f3ath.minesweeper.game;
 
 final class Cell implements CellView {
     private State state = new Covered();

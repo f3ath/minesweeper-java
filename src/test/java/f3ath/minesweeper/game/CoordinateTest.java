@@ -1,4 +1,4 @@
-package f3ath.minesweeper;
+package f3ath.minesweeper.game;
 
 import org.junit.jupiter.api.Test;
 

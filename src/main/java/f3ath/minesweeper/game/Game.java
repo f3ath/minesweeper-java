@@ -1,4 +1,4 @@
-package f3ath.minesweeper;
+package f3ath.minesweeper.game;
 
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -14,14 +14,6 @@ final public class Game {
 
     public void click(Coordinate coordinate) {
         state = state.click(coordinate, board);
-    }
-
-    public int getBoardWidth() {
-        return board.getWidth();
-    }
-
-    public int getBoardHeight() {
-        return board.getHeight();
     }
 
     public Grid<? extends CellView> getBoard() {
@@ -163,7 +155,5 @@ final public class Game {
                     .filter(n -> board.get(n).isCovered())
                     .forEach(c -> click(c, board));
         }
-
-
     }
 }
